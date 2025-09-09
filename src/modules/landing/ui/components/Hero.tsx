@@ -22,7 +22,7 @@ const Hero = () => {
             <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-8 text-center sm:px-6 md:px-8 lg:px-12">
                 <motion.div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12">
                     <Link
-                        href="https://github.com/Jain-Pranjal/JustLink"
+                        href="https://github.com/Jain-Pranjal/Oration-chatbot"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -49,16 +49,16 @@ const Hero = () => {
                 <div className="mb-4 sm:mb-6">
                     <h1 className="bg-gradient-to-r from-[#9C9487] to-[#E5E3DF] bg-clip-text text-center leading-tight font-bold tracking-tight text-transparent">
                         <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl">
-                            All your links
+                            Your AI Career
                         </span>
 
                         <span className="mt-1 block text-3xl sm:mt-2 sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl">
                             <span className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
                                 <span className="whitespace-nowrap">
-                                    Always in
+                                    Counselor
                                 </span>
                                 <span className="bg-gradient-to-r from-[#D6D2C4] via-[#E5E3DF] to-[#F1EEE7] bg-clip-text whitespace-nowrap text-transparent">
-                                    Reach
+                                    Awaits
                                 </span>
                             </span>
                         </span>
@@ -66,7 +66,9 @@ const Hero = () => {
                 </div>
 
                 <p className="mx-auto mb-8 max-w-xs text-sm text-[#e5e3df] sm:mb-10 sm:max-w-md sm:text-base md:max-w-lg md:text-lg lg:max-w-xl lg:text-xl xl:max-w-2xl xl:text-2xl">
-                    Manage, share, and track your links in one place with style.
+                    Unlock personalized career guidance, discover new
+                    opportunities, and confidently navigate your professional
+                    journey with 24/7 AI-powered support.
                 </p>
 
                 <div className="sm:w-auto">
@@ -89,6 +91,11 @@ const Hero = () => {
                             </span>
                         </Link>
                     </Button>
+                </div>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 transform animate-bounce">
+                    <div className="flex h-10 w-6 justify-center rounded-full border-2 border-white/50">
+                        <div className="mt-2 h-3 w-1 rounded-full bg-white/50"></div>
+                    </div>
                 </div>
             </div>
         </div>
