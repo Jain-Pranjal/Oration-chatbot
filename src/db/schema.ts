@@ -1,7 +1,11 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core'
+import { relations } from 'drizzle-orm'
+import { nanoid } from 'nanoid'
 
 export const user = pgTable('user', {
-    id: text('id').primaryKey(),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
     name: text('name').notNull(),
     email: text('email').notNull().unique(),
     emailVerified: boolean('email_verified').default(false).notNull(),
@@ -14,7 +18,9 @@ export const user = pgTable('user', {
 })
 
 export const session = pgTable('session', {
-    id: text('id').primaryKey(),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
     expiresAt: timestamp('expires_at').notNull(),
     token: text('token').notNull().unique(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -29,7 +35,9 @@ export const session = pgTable('session', {
 })
 
 export const account = pgTable('account', {
-    id: text('id').primaryKey(),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
     accountId: text('account_id').notNull(),
     providerId: text('provider_id').notNull(),
     userId: text('user_id')
@@ -49,7 +57,9 @@ export const account = pgTable('account', {
 })
 
 export const verification = pgTable('verification', {
-    id: text('id').primaryKey(),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
@@ -60,9 +70,75 @@ export const verification = pgTable('verification', {
         .notNull(),
 })
 
+export const messageSenderEnum = pgEnum('message_sender', ['user', 'ai'])
+
+export const chatSession = pgTable('chat_session', {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
+    userId: text('user_id')
+        .notNull()
+        .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(), // A name or topic for the chat session
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+})
+
+export const message = pgTable('message', {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => nanoid(10)),
+    chatSessionId: text('chat_session_id')
+        .notNull()
+        .references(() => chatSession.id, { onDelete: 'cascade' }),
+    sender: messageSenderEnum('sender').notNull(), // 'user' or 'ai'
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+//  relations for Drizzle
+export const userRelations = relations(user, ({ many }) => ({
+    sessions: many(session),
+    accounts: many(account),
+    chatSessions: many(chatSession),
+}))
+
+export const sessionRelations = relations(session, ({ one }) => ({
+    user: one(user, {
+        fields: [session.userId],
+        references: [user.id],
+    }),
+}))
+
+export const accountRelations = relations(account, ({ one }) => ({
+    user: one(user, {
+        fields: [account.userId],
+        references: [user.id],
+    }),
+}))
+
+export const chatSessionRelations = relations(chatSession, ({ one, many }) => ({
+    user: one(user, {
+        fields: [chatSession.userId],
+        references: [user.id],
+    }),
+    messages: many(message),
+}))
+
+export const messageRelations = relations(message, ({ one }) => ({
+    chatSession: one(chatSession, {
+        fields: [message.chatSessionId],
+        references: [chatSession.id],
+    }),
+}))
+
 export const FullSchema = {
     user,
     session,
     account,
     verification,
+    chatSession,
+    message,
 }
