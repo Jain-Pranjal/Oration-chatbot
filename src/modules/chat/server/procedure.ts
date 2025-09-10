@@ -8,7 +8,7 @@ import { TRPCError } from '@trpc/server'
 
 export const chatRouter = createTRPCRouter({
     // Create a new chat session
-    create: protectedProcedure
+    createSession: protectedProcedure
         .input(z.object({ title: z.string().min(1) }))
         .mutation(async ({ ctx, input }) => {
             const [session] = await db
@@ -19,6 +19,26 @@ export const chatRouter = createTRPCRouter({
                 })
                 .returning()
             return session
+        }),
+
+    delete: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const session = await db
+                .delete(chatSession)
+                .where(
+                    and(
+                        eq(chatSession.id, input.id),
+                        eq(chatSession.userId, ctx.auth.session.userId)
+                    )
+                )
+                .returning()
+            if (!session.length)
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'Chat session not found or not authorized',
+                })
+            return { success: true }
         }),
 
     // List all chat sessions for the user
@@ -68,12 +88,13 @@ export const messageRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ ctx, input }) => {
+            const { chatSessionId, content } = input // Destructure input
             const session = await db
                 .select()
                 .from(chatSession)
                 .where(
                     and(
-                        eq(chatSession.id, input.chatSessionId),
+                        eq(chatSession.id, chatSessionId),
                         eq(chatSession.userId, ctx.auth.session.userId)
                     )
                 )
@@ -89,21 +110,21 @@ export const messageRouter = createTRPCRouter({
             const [userMessage] = await db
                 .insert(message)
                 .values({
-                    chatSessionId: input.chatSessionId,
-                    sender: messageSenderEnum.enumValues[0], // Assuming 'user' is the first enum value
-                    content: input.content,
+                    chatSessionId: chatSessionId,
+                    sender: messageSenderEnum.enumValues[0], //'user' is the first enum value
+                    content: content,
                 })
                 .returning()
 
             // Call Gemini AI
-            const aiReply = await callCareerCounselorAI(input.content)
+            const aiReply = await callCareerCounselorAI(content)
 
             // Save AI message
             const [aiMessage] = await db
                 .insert(message)
                 .values({
-                    chatSessionId: input.chatSessionId,
-                    sender: messageSenderEnum.enumValues[1], // Assuming 'ai' is the second enum value
+                    chatSessionId: chatSessionId,
+                    sender: messageSenderEnum.enumValues[1], //  'ai' is the second enum value
                     content: aiReply,
                 })
                 .returning()
