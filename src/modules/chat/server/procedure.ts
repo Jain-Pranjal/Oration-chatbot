@@ -58,7 +58,12 @@ export const chatRouter = createTRPCRouter({
             const session = await db
                 .select()
                 .from(chatSession)
-                .where(eq(chatSession.id, input.id))
+                .where(
+                    and(
+                        eq(chatSession.id, input.id),
+                        eq(chatSession.userId, ctx.auth.session.userId)
+                    )
+                )
                 .limit(1)
 
             if (!session.length)

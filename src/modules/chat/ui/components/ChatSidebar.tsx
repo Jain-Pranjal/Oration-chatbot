@@ -7,6 +7,9 @@ import { Plus, MessageCircle, Menu, X, Clock, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTRPC } from '@/trpc/client'
+import { ChatUserButton } from './ChatUserButton'
+
+// so apaki side bar me ek array of the chat sessions aa jayega jisko hum show kargee
 
 interface ChatSidebarProps {
     sessions: {
@@ -102,8 +105,8 @@ export const ChatSidebar = ({
                 </div>
 
                 {/* Chat Sessions List */}
-                <ScrollArea className="flex-1 p-4">
-                    <div className="space-y-3">
+                <ScrollArea className="flex-1 overflow-hidden">
+                    <div className="space-y-3 p-4">
                         {sessions.length === 0 ? (
                             <div className="py-8 text-center">
                                 <MessageCircle className="text-muted-foreground mx-auto mb-3 h-12 w-12" />
@@ -161,6 +164,9 @@ export const ChatSidebar = ({
                         )}
                     </div>
                 </ScrollArea>
+
+                {/* User Button */}
+                <ChatUserButton />
             </div>
 
             {/* Mobile Overlay */}

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -7,7 +7,17 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
 import { ChatSidebar } from './ChatSidebar'
+import { StartChatLoading } from './StartChatLoading'
 import { useTRPC } from '@/trpc/client'
+import ReactMarkdown from 'react-markdown'
+import {
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerDescription,
+    DrawerFooter,
+} from '@/components/ui/drawer'
 import {
     useMutation,
     useQueryClient,
@@ -22,7 +32,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 
-// so humare pass ek fll arrayv ke fimer me sare session ayege and ek iniita jo phele vala hha
 interface ChatInterfaceProps {
     chatSessions: {
         id: string
@@ -55,8 +64,22 @@ export const ChatInterface = ({
     const [inputValue, setInputValue] = useState('')
     const [isTyping, setIsTyping] = useState(false)
     const [sidebarOpen, setSidebarOpen] = useState(true)
+    const [isMobile, setIsMobile] = useState(false)
     const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false)
     const [newChatTitle, setNewChatTitle] = useState('')
+    const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+    // Detect if we're on mobile
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 1024) // lg breakpoint
+        }
+
+        checkIsMobile()
+        window.addEventListener('resize', checkIsMobile)
+
+        return () => window.removeEventListener('resize', checkIsMobile)
+    }, [])
 
     // Pick active session (fallback to first)
     const activeSession =
@@ -69,9 +92,23 @@ export const ChatInterface = ({
         trpc.message.getMessages.queryOptions(
             { chatSessionId: activeSession?.id ?? '', limit: 50 },
             { enabled: !!activeSession }
-            //passingnthre. chart session id for that one whcih we need message
+            // passing the id of the chat session for which we need messages
         )
     )
+
+    // Auto-scroll to bottom when messages change
+    useEffect(() => {
+        if (scrollAreaRef.current) {
+            const scrollContainer = scrollAreaRef.current.querySelector(
+                '[data-radix-scroll-area-viewport]'
+            )
+            if (scrollContainer) {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight
+            }
+        }
+    }, [messages, isTyping])
+
+    // TODO: need to modify the send message function to handle errors and loading states
 
     // Mutation: send message
     const sendMessageMutation = useMutation(
@@ -79,8 +116,11 @@ export const ChatInterface = ({
             onMutate: async ({ chatSessionId, content }) => {
                 setIsTyping(true)
 
+                // Add user message optimistically
                 queryClient.setQueryData(
-                    trpc.message.getMessages.queryKey({ chatSessionId }),
+                    trpc.message.getMessages.queryOptions({
+                        chatSessionId,
+                    }).queryKey,
                     //eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (old: any) => [
                         ...(old ?? []),
@@ -161,9 +201,9 @@ export const ChatInterface = ({
             />
 
             {/* Chat Area */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex h-full flex-1 flex-col">
                 {/* Chat Header */}
-                <div className="border-border border-b bg-white/50 p-4 backdrop-blur-sm">
+                <div className="border-border flex-shrink-0 border-b bg-white/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center space-x-3">
                         <Avatar>
                             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
@@ -182,74 +222,95 @@ export const ChatInterface = ({
                 </div>
 
                 {/* Messages */}
-                <ScrollArea className="flex-1 p-4">
-                    <div className="mx-auto max-w-4xl space-y-4">
-                        {messages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={`animate-fade-in flex items-start space-x-3 ${
-                                    message.sender === 'user'
-                                        ? 'flex-row-reverse space-x-reverse'
-                                        : ''
-                                }`}
-                            >
-                                <Avatar className="flex-shrink-0">
-                                    <AvatarFallback
-                                        className={
-                                            message.sender === 'user'
-                                                ? 'bg-secondary'
-                                                : 'bg-gradient-primary text-primary-foreground'
+                <ScrollArea ref={scrollAreaRef} className="min-h-0 flex-1">
+                    <div className="p-4">
+                        <div className="mx-auto max-w-4xl">
+                            {messages.length === 0 && !isTyping ? (
+                                <StartChatLoading
+                                    onSendMessage={(message) => {
+                                        if (activeSession) {
+                                            sendMessageMutation.mutate({
+                                                chatSessionId: activeSession.id,
+                                                content: message,
+                                            })
                                         }
-                                    >
-                                        {message.sender === 'user' ? (
-                                            <User className="h-4 w-4" />
-                                        ) : (
-                                            <Bot className="h-4 w-4" />
-                                        )}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <Card
-                                    className={`max-w-2xl p-4 ${
-                                        message.sender === 'user'
-                                            ? 'bg-chat-user text-chat-user-foreground ml-12'
-                                            : 'bg-chat-ai text-chat-ai-foreground mr-12'
-                                    }`}
-                                >
-                                    <p className="text-sm leading-relaxed">
-                                        {message.content}
-                                    </p>
-                                    <p className="mt-2 text-xs opacity-70">
-                                        {new Date(
-                                            message.createdAt
-                                        ).toLocaleTimeString()}
-                                    </p>
-                                </Card>
-                            </div>
-                        ))}
+                                    }}
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    {messages.map((message) => (
+                                        <div
+                                            key={message.id}
+                                            className={`animate-fade-in flex items-start space-x-3 ${
+                                                message.sender === 'user'
+                                                    ? 'flex-row-reverse space-x-reverse'
+                                                    : ''
+                                            }`}
+                                        >
+                                            <Avatar className="flex-shrink-0">
+                                                <AvatarFallback
+                                                    className={
+                                                        message.sender ===
+                                                        'user'
+                                                            ? 'bg-secondary'
+                                                            : 'bg-gradient-primary text-primary-foreground'
+                                                    }
+                                                >
+                                                    {message.sender ===
+                                                    'user' ? (
+                                                        <User className="h-4 w-4" />
+                                                    ) : (
+                                                        <Bot className="h-4 w-4" />
+                                                    )}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <Card
+                                                className={`max-w-2xl gap-2 p-4 ${
+                                                    message.sender === 'user'
+                                                        ? 'bg-chat-user text-chat-user-foreground ml-12'
+                                                        : 'bg-chat-ai text-chat-ai-foreground mr-12'
+                                                }`}
+                                            >
+                                                <p className="text-sm leading-relaxed">
+                                                    <ReactMarkdown>
+                                                        {message.content}
+                                                    </ReactMarkdown>
+                                                </p>
+                                                <p className="mt-2 text-xs opacity-70">
+                                                    {new Date(
+                                                        message.createdAt
+                                                    ).toLocaleTimeString()}
+                                                </p>
+                                            </Card>
+                                        </div>
+                                    ))}
 
-                        {isTyping && (
-                            <div className="animate-fade-in flex items-start space-x-3">
-                                <Avatar>
-                                    <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-                                        <Bot className="h-4 w-4" />
-                                    </AvatarFallback>
-                                </Avatar>
-                                <Card className="bg-chat-ai text-chat-ai-foreground mr-12 p-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        <span className="text-sm">
-                                            AI is thinking...
-                                        </span>
-                                    </div>
-                                </Card>
-                            </div>
-                        )}
+                                    {isTyping && (
+                                        <div className="animate-fade-in flex items-start space-x-3">
+                                            <Avatar>
+                                                <AvatarFallback className="bg-gradient-primary text-primary-foreground">
+                                                    <Bot className="h-4 w-4" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <Card className="bg-chat-ai text-chat-ai-foreground mr-12 p-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                    <span className="text-sm">
+                                                        AI is thinking...
+                                                    </span>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </ScrollArea>
 
                 {/* Input Area */}
                 {activeSession && (
-                    <div className="border-border border-t bg-white/50 p-4 backdrop-blur-sm">
+                    <div className="border-border flex-shrink-0 border-t bg-white/50 p-4 backdrop-blur-sm">
                         <div className="mx-auto max-w-4xl">
                             <div className="flex items-end space-x-3">
                                 <div className="flex-1">
@@ -278,71 +339,159 @@ export const ChatInterface = ({
                 )}
             </div>
 
-            {/* New Chat Dialog */}
-            <Dialog
-                open={isNewChatDialogOpen}
-                onOpenChange={setIsNewChatDialogOpen}
-            >
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Create New Chat Session</DialogTitle>
-                        <DialogDescription>
-                            Give your new chat session a descriptive title to
-                            help you organize your conversations.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <label
-                                htmlFor="title"
-                                className="text-right text-sm font-medium"
-                            >
-                                Title
-                            </label>
-                            <Input
-                                id="title"
-                                value={newChatTitle}
-                                onChange={(e) =>
-                                    setNewChatTitle(e.target.value)
-                                }
-                                placeholder="e.g., Career Advice, Resume Review..."
-                                className="col-span-3"
-                                onKeyPress={(e) => {
-                                    if (
-                                        e.key === 'Enter' &&
-                                        newChatTitle.trim()
-                                    ) {
-                                        handleCreateNewChat()
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
+            {/* New Chat Dialog/Drawer */}
+            {isNewChatDialogOpen &&
+                (isMobile ? (
+                    /* Mobile Version - Drawer */
+                    <Drawer
+                        open={true}
+                        onOpenChange={(open) => {
+                            if (!open) {
                                 setIsNewChatDialogOpen(false)
                                 setNewChatTitle('')
-                            }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="button"
-                            onClick={handleCreateNewChat}
-                            disabled={
-                                !newChatTitle.trim() || createSession.isPending
                             }
-                        >
-                            {createSession.isPending
-                                ? 'Creating...'
-                                : 'Create Chat'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        }}
+                    >
+                        <DrawerContent>
+                            <DrawerHeader>
+                                <DrawerTitle>
+                                    Create New Chat Session
+                                </DrawerTitle>
+                                <DrawerDescription>
+                                    Give your new chat session a descriptive
+                                    title to help you organize your
+                                    conversations.
+                                </DrawerDescription>
+                            </DrawerHeader>
+                            <div className="grid gap-4 px-4 py-4">
+                                <div className="flex flex-col gap-2">
+                                    <label
+                                        htmlFor="title-mobile"
+                                        className="text-sm font-medium"
+                                    >
+                                        Title
+                                    </label>
+                                    <Input
+                                        id="title-mobile"
+                                        value={newChatTitle}
+                                        onChange={(e) =>
+                                            setNewChatTitle(e.target.value)
+                                        }
+                                        placeholder="e.g., Career Advice, Resume Review..."
+                                        className="w-full"
+                                        onKeyPress={(e) => {
+                                            if (
+                                                e.key === 'Enter' &&
+                                                newChatTitle.trim()
+                                            ) {
+                                                handleCreateNewChat()
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <DrawerFooter>
+                                <Button
+                                    type="button"
+                                    onClick={handleCreateNewChat}
+                                    disabled={
+                                        !newChatTitle.trim() ||
+                                        createSession.isPending
+                                    }
+                                >
+                                    {createSession.isPending
+                                        ? 'Creating...'
+                                        : 'Create Chat'}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => {
+                                        setIsNewChatDialogOpen(false)
+                                        setNewChatTitle('')
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                            </DrawerFooter>
+                        </DrawerContent>
+                    </Drawer>
+                ) : (
+                    /* Desktop Version - Dialog */
+                    <Dialog
+                        open={true}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                setIsNewChatDialogOpen(false)
+                                setNewChatTitle('')
+                            }
+                        }}
+                    >
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Create New Chat Session
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Give your new chat session a descriptive
+                                    title to help you organize your
+                                    conversations.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="flex flex-col gap-2">
+                                    <label
+                                        htmlFor="title-desktop"
+                                        className="text-sm font-medium"
+                                    >
+                                        Title
+                                    </label>
+                                    <Input
+                                        id="title-desktop"
+                                        value={newChatTitle}
+                                        onChange={(e) =>
+                                            setNewChatTitle(e.target.value)
+                                        }
+                                        placeholder="e.g., Career Advice, Resume Review..."
+                                        className="w-full"
+                                        onKeyPress={(e) => {
+                                            if (
+                                                e.key === 'Enter' &&
+                                                newChatTitle.trim()
+                                            ) {
+                                                handleCreateNewChat()
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    onClick={handleCreateNewChat}
+                                    disabled={
+                                        !newChatTitle.trim() ||
+                                        createSession.isPending
+                                    }
+                                >
+                                    {createSession.isPending
+                                        ? 'Creating...'
+                                        : 'Create Chat'}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => {
+                                        setIsNewChatDialogOpen(false)
+                                        setNewChatTitle('')
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                ))}
         </div>
     )
 }
