@@ -84,6 +84,7 @@ export const chatSession = pgTable('chat_session', {
     updatedAt: timestamp('updated_at')
         .$onUpdate(() => new Date())
         .notNull(),
+    lastMessageAt: timestamp('last_message_at').defaultNow().notNull(),
 })
 
 export const message = pgTable('message', {
