@@ -92,7 +92,7 @@ export const StartChatLoading = ({ onSendMessage }: StartChatLoadingProps) => {
                     <h2 className="text-foreground mb-6 text-xl font-semibold">
                         Try asking me about:
                     </h2>
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="mx-auto max-w-md space-y-3">
                         {suggestedMessages.map((message, index) => (
                             <motion.div
                                 key={index}
@@ -102,7 +102,7 @@ export const StartChatLoading = ({ onSendMessage }: StartChatLoadingProps) => {
                             >
                                 <Button
                                     variant="outline"
-                                    className="hover:bg-primary/5 hover:border-primary/20 h-auto w-full justify-between p-4 text-left"
+                                    className="hover:bg-primary/5 hover:border-primary/20 h-auto w-full cursor-pointer justify-between p-4 text-left"
                                     onClick={() => onSendMessage(message)}
                                 >
                                     <span className="text-sm">{message}</span>

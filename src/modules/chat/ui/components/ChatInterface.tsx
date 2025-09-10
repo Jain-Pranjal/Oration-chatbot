@@ -271,11 +271,11 @@ export const ChatInterface = ({
                                                         : 'bg-chat-ai text-chat-ai-foreground mr-12'
                                                 }`}
                                             >
-                                                <p className="text-sm leading-relaxed">
+                                                <div className="text-sm leading-relaxed">
                                                     <ReactMarkdown>
                                                         {message.content}
                                                     </ReactMarkdown>
-                                                </p>
+                                                </div>
                                                 <p className="mt-2 text-xs opacity-70">
                                                     {new Date(
                                                         message.createdAt
@@ -468,6 +468,16 @@ export const ChatInterface = ({
                             <DialogFooter>
                                 <Button
                                     type="button"
+                                    variant="destructive"
+                                    onClick={() => {
+                                        setIsNewChatDialogOpen(false)
+                                        setNewChatTitle('')
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
                                     onClick={handleCreateNewChat}
                                     disabled={
                                         !newChatTitle.trim() ||
@@ -477,16 +487,6 @@ export const ChatInterface = ({
                                     {createSession.isPending
                                         ? 'Creating...'
                                         : 'Create Chat'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    onClick={() => {
-                                        setIsNewChatDialogOpen(false)
-                                        setNewChatTitle('')
-                                    }}
-                                >
-                                    Cancel
                                 </Button>
                             </DialogFooter>
                         </DialogContent>

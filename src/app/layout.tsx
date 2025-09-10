@@ -4,6 +4,7 @@ import './globals.css'
 import { constructMetadata } from '@/lib/utils'
 import { TRPCReactProvider } from '@/trpc/client'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from '@/components/ui/sonner'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -28,6 +29,7 @@ export default function RootLayout({
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} antialiased`}
                 >
+                    <Toaster position="bottom-right" />
                     {children}
                     <Analytics />
                 </body>

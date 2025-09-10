@@ -12,7 +12,7 @@ export const authClient = createAuthClient({
             // Configure prompt behavior and exponential backoff:
             promptOptions: {
                 baseDelay: 1000,
-                maxAttempts: 5,
+                maxAttempts: 3,
             },
         }),
     ],
