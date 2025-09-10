@@ -23,8 +23,8 @@ export const metadata: Metadata = {
         title: 'Chat',
         description:
             'Get the best career advice and guidance from our AI-powered career counselor. Start your journey to success today!',
-        url: 'https://justlink.live/sign-up', //TODO: change url
-        siteName: 'JustLink',
+        url: 'https://oration-chatbot.vercel.app/chat',
+        siteName: 'Oration AI Chatbot',
         locale: 'en_US',
         type: 'website',
     },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         description:
             'Get the best career advice and guidance from our AI-powered career counselor. Start your journey to success today!',
         card: 'summary_large_image',
-        site: 'https://justlink.live', //TODO: change url
+        site: 'https://oration-chatbot.vercel.app/chat',
     },
 }
 
