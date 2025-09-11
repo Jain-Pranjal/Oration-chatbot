@@ -1,4 +1,11 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core'
+import {
+    pgTable,
+    text,
+    timestamp,
+    boolean,
+    pgEnum,
+    uniqueIndex,
+} from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
@@ -72,20 +79,29 @@ export const verification = pgTable('verification', {
 
 export const messageSenderEnum = pgEnum('message_sender', ['user', 'ai'])
 
-export const chatSession = pgTable('chat_session', {
-    id: text('id')
-        .primaryKey()
-        .$defaultFn(() => nanoid(10)),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' }),
-    title: text('title').notNull(), // A name or topic for the chat session
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at')
-        .$onUpdate(() => new Date())
-        .notNull(),
-    lastMessageAt: timestamp('last_message_at').defaultNow().notNull(),
-})
+export const chatSession = pgTable(
+    'chat_session',
+    {
+        id: text('id')
+            .primaryKey()
+            .$defaultFn(() => nanoid(10)),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        title: text('title').notNull(), // A name or topic for the chat session
+        createdAt: timestamp('created_at').defaultNow().notNull(),
+        updatedAt: timestamp('updated_at')
+            .$onUpdate(() => new Date())
+            .notNull(),
+        lastMessageAt: timestamp('last_message_at').defaultNow().notNull(),
+    },
+    (table) => ({
+        uniqueUserTitle: uniqueIndex('unique_user_title').on(
+            table.userId,
+            table.title
+        ),
+    })
+)
 
 export const message = pgTable('message', {
     id: text('id')

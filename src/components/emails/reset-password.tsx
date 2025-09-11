@@ -38,7 +38,7 @@ const ForgotPasswordEmail = (props: ForgotPasswordEmailProps) => {
                                     src={`${process.env.NEXT_PUBLIC_APP_URL}/Logo.png`}
                                     alt="Oration AI Chatbot Logo"
                                     width="120"
-                                    height="40"
+                                    height="60"
                                     className="mx-auto"
                                 />
                             </Section>

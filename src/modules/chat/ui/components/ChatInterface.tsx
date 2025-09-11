@@ -314,7 +314,10 @@ export const ChatInterface = ({
                                                 <p className="mt-2 text-xs opacity-70">
                                                     {new Date(
                                                         message.createdAt
-                                                    ).toLocaleTimeString()}
+                                                    ).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
                                                 </p>
                                             </Card>
                                         </div>

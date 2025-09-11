@@ -79,7 +79,7 @@ export const auth = betterAuth({
     plugins: [
         haveIBeenPwned({
             customPasswordCompromisedMessage:
-                'This password has been exposed in a data breach. Please choose a stronger, unique password.',
+                'This is a very simple password. Please choose a stronger, unique password.',
         }),
         oneTap(),
     ],

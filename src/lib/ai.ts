@@ -23,15 +23,12 @@ export async function callCareerCounselorAI(userMessage: string) {
             const chunkText = chunk.text()
             if (chunkText) {
                 finalText += chunkText
-                // 🔥 Here you can push partial text to the client via SSE / WebSocket
-                console.log('Partial:', chunkText)
             }
         }
 
         // When streaming ends
         return finalText
     } catch (err) {
-        console.error('Gemini Streaming API error:', err)
         return 'Sorry, I’m having trouble generating a response right now.'
     }
 }

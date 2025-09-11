@@ -158,10 +158,10 @@ export function ChatUserButton() {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        {/* <DropdownMenuItem>
                             <Settings className="mr-2 size-4" />
                             Account Settings
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                             className="text-red-600"
                             onClick={handleLogout}

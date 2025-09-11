@@ -11,10 +11,8 @@ interface StartChatLoadingProps {
 
 export const StartChatLoading = ({ onSendMessage }: StartChatLoadingProps) => {
     const suggestedMessages = [
-        'Help me improve my resume',
         'What career path should I choose?',
         'How to prepare for job interviews?',
-        'Tell me about salary negotiation',
         'What skills are in demand right now?',
     ]
 
