@@ -1,4 +1,4 @@
-// import { GlobalNavbar } from '@/components/global/Navbar'
+import { GlobalNavbar } from '@/components/global/Navbar'
 
 export default function MainLayout({
     children,
@@ -7,7 +7,7 @@ export default function MainLayout({
 }) {
     return (
         <>
-            {/* <GlobalNavbar /> */}
+            <GlobalNavbar />
             {children}
         </>
     )

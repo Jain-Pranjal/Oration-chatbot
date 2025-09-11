@@ -1,4 +1,4 @@
-// import { GlobalNavbar } from '@/components/global/Navbar'
+import { GlobalNavbar } from '@/components/global/Navbar'
 import NotFoundClient from '@/components/NotFoundClient'
 
 import { Metadata } from 'next'
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
     return (
         <>
-            {/* <GlobalNavbar /> */}
+            <GlobalNavbar />
             <NotFoundClient />
         </>
     )
