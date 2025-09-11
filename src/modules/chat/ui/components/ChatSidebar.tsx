@@ -63,7 +63,7 @@ export const ChatSidebar = ({
             <Button
                 variant="ghost"
                 size="icon"
-                className={`fixed top-4 left-4 z-50 bg-white/80 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+                className={`bg-card/80 fixed top-4 left-4 z-50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
                     isOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
                 }`}
                 onClick={onToggle}
@@ -73,7 +73,7 @@ export const ChatSidebar = ({
 
             {/* Sidebar */}
             <div
-                className={` ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} border-border lg:bg-gradient-card fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r bg-white/95 shadow-xl backdrop-blur-md transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:backdrop-blur-sm`}
+                className={` ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} border-border lg:bg-gradient-card bg-card/95 fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r shadow-xl backdrop-blur-md transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:backdrop-blur-sm`}
             >
                 {/* Sidebar Header */}
                 <div className="border-border border-b p-4">
@@ -120,7 +120,7 @@ export const ChatSidebar = ({
                                 <Card
                                     key={session.id}
                                     onClick={() => onSelectSession(session.id)}
-                                    className="hover:shadow-medium group shadow-soft cursor-pointer border-0 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:scale-[1.02]"
+                                    className="hover:shadow-medium group shadow-soft border-border bg-card/50 cursor-pointer p-3 backdrop-blur-sm transition-all duration-200 hover:scale-[1.02]"
                                 >
                                     <div className="mb-2 flex items-start justify-between">
                                         <h3 className="text-foreground group-hover:text-primary text-md truncate pr-2 font-medium transition-colors">

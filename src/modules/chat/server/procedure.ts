@@ -11,6 +11,26 @@ export const chatRouter = createTRPCRouter({
     createSession: protectedProcedure
         .input(z.object({ title: z.string().min(1) }))
         .mutation(async ({ ctx, input }) => {
+            // Check if a session with the same title already exists for this user
+            const existingSession = await db
+                .select()
+                .from(chatSession)
+                .where(
+                    and(
+                        eq(chatSession.title, input.title),
+                        eq(chatSession.userId, ctx.auth.session.userId)
+                    )
+                )
+                .limit(1)
+
+            if (existingSession.length > 0) {
+                throw new TRPCError({
+                    code: 'CONFLICT',
+                    message:
+                        'A chat session with this title already exists for this user.',
+                })
+            }
+
             const [session] = await db
                 .insert(chatSession)
                 .values({

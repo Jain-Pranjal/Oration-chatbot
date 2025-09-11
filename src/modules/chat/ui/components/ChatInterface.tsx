@@ -13,6 +13,7 @@ import ReactMarkdown from 'react-markdown'
 import { Textarea } from '@/components/ui/textarea'
 import { generatedAvatarURI } from '@/lib/avatarURI'
 import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
 import {
     Drawer,
     DrawerContent,
@@ -167,6 +168,12 @@ export const ChatInterface = ({
                 setIsNewChatDialogOpen(false)
                 setNewChatTitle('')
             },
+            onError: (error) => {
+                toast.error(
+                    error?.message ||
+                        'Failed to create chat session. Please try again.'
+                )
+            },
         })
     )
 
@@ -207,9 +214,9 @@ export const ChatInterface = ({
             />
 
             {/* Chat Area */}
-            <div className="flex h-full flex-1 flex-col">
+            <div className="bg-background flex h-full flex-1 flex-col">
                 {/* Chat Header */}
-                <div className="border-border flex-shrink-0 border-b bg-white/50 p-4 backdrop-blur-sm">
+                <div className="border-border bg-card/50 flex-shrink-0 border-b p-4 backdrop-blur-sm">
                     <div className="flex items-center space-x-3">
                         <Avatar>
                             <AvatarImage
@@ -355,7 +362,7 @@ export const ChatInterface = ({
 
                 {/* Input Area */}
                 {activeSession && (
-                    <div className="border-border flex-shrink-0 bg-white/50 p-4 backdrop-blur-sm">
+                    <div className="border-border bg-card/50 flex-shrink-0 border-t p-4 backdrop-blur-sm">
                         <div className="mx-auto max-w-4xl">
                             <div className="flex items-end space-x-3">
                                 <div className="flex-1">
@@ -366,7 +373,7 @@ export const ChatInterface = ({
                                         }
                                         onKeyPress={handleKeyPress}
                                         placeholder="Ask me anything about your career..."
-                                        className="bg-muted/50 focus:bg-background max-h-[120px] min-h-[44px] resize-none overflow-y-auto border-0"
+                                        className="bg-muted focus:bg-background border-border max-h-[120px] min-h-[44px] resize-none overflow-y-auto"
                                     />
                                 </div>
                                 <Button
