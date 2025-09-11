@@ -43,12 +43,31 @@ export const chatRouter = createTRPCRouter({
 
     // List all chat sessions for the user
     getAllChatSessions: protectedProcedure.query(async ({ ctx }) => {
-        const chatSessions = await db
+        // First get all chat sessions
+        const sessions = await db
             .select()
             .from(chatSession)
             .where(eq(chatSession.userId, ctx.auth.session.userId))
             .orderBy(desc(chatSession.createdAt))
-        return { chatSessions }
+
+        // Then get the last message for each session
+        const sessionsWithLastMessage = await Promise.all(
+            sessions.map(async (session) => {
+                const lastMessage = await db
+                    .select()
+                    .from(message)
+                    .where(eq(message.chatSessionId, session.id))
+                    .orderBy(desc(message.createdAt))
+                    .limit(1)
+
+                return {
+                    ...session,
+                    lastMessage: lastMessage[0]?.content || null,
+                }
+            })
+        )
+
+        return { chatSessions: sessionsWithLastMessage }
     }),
 
     // Get one session (with messages optionally)

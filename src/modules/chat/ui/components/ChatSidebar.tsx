@@ -125,7 +125,7 @@ export const ChatSidebar = ({
                                     className="hover:shadow-medium group shadow-soft cursor-pointer border-0 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:scale-[1.02]"
                                 >
                                     <div className="mb-2 flex items-start justify-between">
-                                        <h3 className="text-foreground group-hover:text-primary truncate pr-2 text-sm font-medium transition-colors">
+                                        <h3 className="text-foreground group-hover:text-primary text-md truncate pr-2 font-medium transition-colors">
                                             {session.title}
                                         </h3>
                                         <div className="flex items-center space-x-1 opacity-0 transition-opacity group-hover:opacity-100">
@@ -144,11 +144,15 @@ export const ChatSidebar = ({
                                             </Button>
                                         </div>
                                     </div>
-
-                                    <p className="text-muted-foreground mb-3 line-clamp-2 text-xs">
-                                        {session.lastMessage ??
-                                            'No messages yet'}
-                                    </p>
+                                    <div className="mb-3">
+                                        <span className="text-muted-foreground text-xs font-bold">
+                                            Last message:
+                                        </span>
+                                        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
+                                            {session.lastMessage ??
+                                                'No messages yet'}
+                                        </p>
+                                    </div>
 
                                     <div className="flex items-center justify-between">
                                         <Badge

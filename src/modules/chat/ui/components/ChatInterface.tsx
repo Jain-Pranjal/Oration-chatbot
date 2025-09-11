@@ -10,6 +10,7 @@ import { ChatSidebar } from './ChatSidebar'
 import { StartChatLoading } from './StartChatLoading'
 import { useTRPC } from '@/trpc/client'
 import ReactMarkdown from 'react-markdown'
+import { Textarea } from '@/components/ui/textarea'
 import {
     Drawer,
     DrawerContent,
@@ -271,7 +272,7 @@ export const ChatInterface = ({
                                                         : 'bg-chat-ai text-chat-ai-foreground mr-12'
                                                 }`}
                                             >
-                                                <div className="text-sm leading-relaxed">
+                                                <div className="overflow-x-auto text-sm leading-relaxed">
                                                     <ReactMarkdown>
                                                         {message.content}
                                                     </ReactMarkdown>
@@ -310,18 +311,18 @@ export const ChatInterface = ({
 
                 {/* Input Area */}
                 {activeSession && (
-                    <div className="border-border flex-shrink-0 border-t bg-white/50 p-4 backdrop-blur-sm">
+                    <div className="border-border flex-shrink-0 bg-white/50 p-4 backdrop-blur-sm">
                         <div className="mx-auto max-w-4xl">
                             <div className="flex items-end space-x-3">
                                 <div className="flex-1">
-                                    <Input
+                                    <Textarea
                                         value={inputValue}
                                         onChange={(e) =>
                                             setInputValue(e.target.value)
                                         }
                                         onKeyPress={handleKeyPress}
                                         placeholder="Ask me anything about your career..."
-                                        className="bg-muted/50 focus:bg-background min-h-[44px] resize-none border-0"
+                                        className="bg-muted/50 focus:bg-background max-h-[120px] min-h-[44px] resize-none overflow-y-auto border-0"
                                     />
                                 </div>
                                 <Button
