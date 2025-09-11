@@ -17,5 +17,3 @@ export default function NotFound() {
         </>
     )
 }
-
-// TODO: add the navbar here

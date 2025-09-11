@@ -22,7 +22,6 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
                     />
                     <div className="mt-2 text-center">
                         <p className="mt-2 max-w-md text-sm text-white/80 sm:text-base md:mt-4">
-                            {/* TODO: need to change the desc here also , keep same as meta or diff ? */}
                             Get the best career advice and guidance from our
                             AI-powered career counselor. Start your journey to
                             success today!
