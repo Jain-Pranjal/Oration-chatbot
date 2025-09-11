@@ -92,13 +92,13 @@ export function ChatUserButton() {
                         </DrawerHeader>
 
                         <div className="space-y-2 px-4">
-                            <Button
+                            {/* <Button
                                 variant="outline"
                                 className="w-full justify-start gap-2"
                             >
                                 <Settings className="size-4" />
                                 Account Settings
-                            </Button>
+                            </Button> */}
 
                             <Button
                                 variant="destructive"

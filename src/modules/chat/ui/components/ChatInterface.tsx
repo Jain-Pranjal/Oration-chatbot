@@ -4,13 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
 import { ChatSidebar } from './ChatSidebar'
 import { StartChatLoading } from './StartChatLoading'
 import { useTRPC } from '@/trpc/client'
 import ReactMarkdown from 'react-markdown'
 import { Textarea } from '@/components/ui/textarea'
+import { generatedAvatarURI } from '@/lib/avatarURI'
+import { authClient } from '@/lib/auth-client'
 import {
     Drawer,
     DrawerContent,
@@ -69,6 +71,7 @@ export const ChatInterface = ({
     const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false)
     const [newChatTitle, setNewChatTitle] = useState('')
     const scrollAreaRef = useRef<HTMLDivElement>(null)
+    const { data, isPending } = authClient.useSession()
 
     // Detect if we're on mobile
     useEffect(() => {
@@ -153,6 +156,24 @@ export const ChatInterface = ({
         })
     )
 
+    // Mutation: create new chat session
+    const createSession = useMutation(
+        trpc.chat.createSession.mutationOptions({
+            onSuccess: async (newSession) => {
+                await queryClient.invalidateQueries(
+                    trpc.chat.getAllChatSessions.queryOptions()
+                )
+                setActiveSessionId(newSession.id)
+                setIsNewChatDialogOpen(false)
+                setNewChatTitle('')
+            },
+        })
+    )
+
+    if (isPending || !data?.user) {
+        return null
+    }
+
     const handleSendMessage = () => {
         if (!inputValue.trim() || !activeSession) return
         sendMessageMutation.mutate({
@@ -168,22 +189,6 @@ export const ChatInterface = ({
             handleSendMessage()
         }
     }
-
-    // Mutation: create new chat session
-    const createSession = useMutation(
-        trpc.chat.createSession.mutationOptions({
-            onSuccess: async (newSession) => {
-                await queryClient.invalidateQueries(
-                    trpc.chat.getAllChatSessions.queryOptions()
-                )
-                setActiveSessionId(newSession.id)
-                setIsNewChatDialogOpen(false)
-                setNewChatTitle('')
-            },
-        })
-    )
-
-    // TODO: need to provide the dialog to ask for the title of the chat session and then create the session with that title
 
     const handleCreateNewChat = () => {
         if (newChatTitle.trim()) {
@@ -207,6 +212,13 @@ export const ChatInterface = ({
                 <div className="border-border flex-shrink-0 border-b bg-white/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center space-x-3">
                         <Avatar>
+                            <AvatarImage
+                                src={generatedAvatarURI({
+                                    seed: `${activeSession?.title ?? 'AI Career Counselor'}`,
+                                    variant: 'rings',
+                                })}
+                                alt="AI Career Counselor"
+                            />
                             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
                                 <Bot className="h-5 w-5" />
                             </AvatarFallback>
@@ -249,21 +261,43 @@ export const ChatInterface = ({
                                             }`}
                                         >
                                             <Avatar className="flex-shrink-0">
-                                                <AvatarFallback
-                                                    className={
-                                                        message.sender ===
-                                                        'user'
-                                                            ? 'bg-secondary'
-                                                            : 'bg-gradient-primary text-primary-foreground'
-                                                    }
-                                                >
-                                                    {message.sender ===
-                                                    'user' ? (
-                                                        <User className="h-4 w-4" />
-                                                    ) : (
-                                                        <Bot className="h-4 w-4" />
-                                                    )}
-                                                </AvatarFallback>
+                                                {message.sender === 'user' ? (
+                                                    <>
+                                                        <AvatarImage
+                                                            src={
+                                                                data.user
+                                                                    .image ||
+                                                                generatedAvatarURI(
+                                                                    {
+                                                                        seed: `${data.user.name ?? 'User'}`,
+                                                                        variant:
+                                                                            'openPeeps',
+                                                                    }
+                                                                )
+                                                            }
+                                                            alt="User Profile"
+                                                        />
+                                                        <AvatarFallback className="bg-gradient-primary text-primary-foreground">
+                                                            <User className="h-4 w-4" />
+                                                        </AvatarFallback>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <AvatarImage
+                                                            src={generatedAvatarURI(
+                                                                {
+                                                                    seed: `${activeSession?.title ?? 'AI Career Counselor'}`,
+                                                                    variant:
+                                                                        'rings',
+                                                                }
+                                                            )}
+                                                            alt="AI Career Counselor"
+                                                        />
+                                                        <AvatarFallback className="bg-gradient-primary text-primary-foreground">
+                                                            <Bot className="h-4 w-4" />
+                                                        </AvatarFallback>
+                                                    </>
+                                                )}
                                             </Avatar>
                                             <Card
                                                 className={`max-w-2xl gap-2 p-4 ${
@@ -289,6 +323,13 @@ export const ChatInterface = ({
                                     {isTyping && (
                                         <div className="animate-fade-in flex items-start space-x-3">
                                             <Avatar>
+                                                <AvatarImage
+                                                    src={generatedAvatarURI({
+                                                        seed: `${activeSession?.title ?? 'AI Career Counselor'}`,
+                                                        variant: 'rings',
+                                                    })}
+                                                    alt="AI Career Counselor"
+                                                />
                                                 <AvatarFallback className="bg-gradient-primary text-primary-foreground">
                                                     <Bot className="h-4 w-4" />
                                                 </AvatarFallback>

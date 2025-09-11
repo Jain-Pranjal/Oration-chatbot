@@ -40,8 +40,8 @@ const Pricing = () => {
     const plans = [
         {
             name: 'Basic',
-            price: '$9',
-            period: '/month',
+            price: 'Free',
+            period: '/Forever',
             features: ['AI Chat Support', 'Basic Analytics', 'Email Support'],
             buttonText: 'Get Started',
         },

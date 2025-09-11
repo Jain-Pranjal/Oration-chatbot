@@ -63,19 +63,17 @@ export const ChatSidebar = ({
             <Button
                 variant="ghost"
                 size="icon"
-                className="fixed top-4 left-4 z-50 bg-white/80 backdrop-blur-sm lg:hidden"
+                className={`fixed top-4 left-4 z-50 bg-white/80 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+                    isOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
+                }`}
                 onClick={onToggle}
             >
-                {isOpen ? (
-                    <X className="h-5 w-5" />
-                ) : (
-                    <Menu className="h-5 w-5" />
-                )}
+                <Menu className="h-5 w-5" />
             </Button>
 
             {/* Sidebar */}
             <div
-                className={` ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-gradient-card border-border fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r transition-transform duration-300 ease-in-out lg:relative lg:transform-none`}
+                className={` ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} border-border lg:bg-gradient-card fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r bg-white/95 shadow-xl backdrop-blur-md transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:backdrop-blur-sm`}
             >
                 {/* Sidebar Header */}
                 <div className="border-border border-b p-4">
