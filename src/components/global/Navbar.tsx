@@ -16,7 +16,7 @@ import Link from 'next/link'
 export function GlobalNavbar() {
     const navItems = [
         {
-            name: 'Chat',
+            name: 'AI Chat',
             link: '/chat',
         },
         {
@@ -25,7 +25,8 @@ export function GlobalNavbar() {
         },
         {
             name: 'Contact',
-            link: '#contact',
+            link: 'https://github.com/Jain-Pranjal/Oration-chatbot',
+            target: '_blank',
         },
     ]
 
