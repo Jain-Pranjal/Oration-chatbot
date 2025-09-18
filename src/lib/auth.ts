@@ -5,6 +5,7 @@ import { db } from '@/db'
 import { FullSchema } from '@/db/schema'
 import { haveIBeenPwned } from 'better-auth/plugins'
 import { oneTap } from 'better-auth/plugins'
+import { lastLoginMethod } from 'better-auth/plugins'
 import { resend } from '@/lib/resend'
 import VerifyEmail from '@/components/emails/verify-email'
 import ForgotPasswordEmail from '@/components/emails/reset-password'
@@ -82,5 +83,6 @@ export const auth = betterAuth({
                 'This is a very simple password. Please choose a stronger, unique password.',
         }),
         oneTap(),
+        lastLoginMethod(),
     ],
 })

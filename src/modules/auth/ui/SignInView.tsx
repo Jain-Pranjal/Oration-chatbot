@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { LastUsedBadge } from '@/components/LastUsedBadge'
 import { FaGithub } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import Link from 'next/link'
@@ -34,6 +36,8 @@ const SigninView = () => {
     const [showPassword, setShowPassword] = useState(false)
     const router = useRouter()
     const session = authClient.useSession().data //client side session data
+    const lastMethod = authClient.getLastUsedLoginMethod()
+    console.log('Last login method:', lastMethod)
 
     // defining the form
     const form = useForm<z.infer<typeof formSchema>>({
@@ -213,7 +217,12 @@ const SigninView = () => {
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                                Email
+                                {lastMethod === 'email' && (
+                                    <LastUsedBadge className="relative mt-4" />
+                                )}
+                            </FormLabel>
                             <FormControl>
                                 <Input
                                     placeholder="you@example.com"
@@ -273,9 +282,16 @@ const SigninView = () => {
                 />
 
                 <div className="flex justify-center">
-                    <Button type="submit" className="w-full" disabled={pending}>
-                        Sign In
-                    </Button>
+                    <div className="relative w-full">
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={pending}
+                            variant="default"
+                        >
+                            Sign In
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="mt-4 flex flex-col space-y-4">
@@ -290,27 +306,33 @@ const SigninView = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-                        <Button
-                            type="button"
-                            disabled={pending}
-                            variant="outline"
-                            className="flex w-full items-center justify-center gap-2 sm:w-40"
-                            onClick={() => onSocial('google')}
-                        >
-                            <FcGoogle className="h-4 w-4" />
-                            Google
-                        </Button>
+                        <div className="relative">
+                            <Button
+                                type="button"
+                                disabled={pending}
+                                variant="outline"
+                                className="flex w-full items-center justify-center gap-2 sm:w-40"
+                                onClick={() => onSocial('google')}
+                            >
+                                <FcGoogle className="h-4 w-4" />
+                                Google
+                            </Button>
+                            {lastMethod === 'google' && <LastUsedBadge />}
+                        </div>
 
-                        <Button
-                            disabled={pending}
-                            type="button"
-                            variant="outline"
-                            className="flex w-full items-center justify-center gap-2 sm:w-40"
-                            onClick={() => onSocial('github')}
-                        >
-                            <FaGithub className="h-4 w-4" />
-                            GitHub
-                        </Button>
+                        <div className="relative">
+                            <Button
+                                disabled={pending}
+                                type="button"
+                                variant="outline"
+                                className="flex w-full items-center justify-center gap-2 sm:w-40"
+                                onClick={() => onSocial('github')}
+                            >
+                                <FaGithub className="h-4 w-4" />
+                                GitHub
+                            </Button>
+                            {lastMethod === 'github' && <LastUsedBadge />}
+                        </div>
                     </div>
                 </div>
             </form>

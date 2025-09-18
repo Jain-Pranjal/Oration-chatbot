@@ -44,7 +44,7 @@ interface ChatInterfaceProps {
         updatedAt: string
         userId: string
         lastMessageAt: string
-    }[]
+    }[] //chat sessions is the array of chat sessions
     initialActiveSession: {
         id: string
         title: string
