@@ -153,7 +153,98 @@ oration-chatbot/
 
 ---
 
-## 📝 License
+## � Docker Deployment
+
+### Build and Run with Docker
+
+1. **Clone the repository and navigate to the project directory:**
+
+    ```bash
+    git clone https://github.com/Jain-Pranjal/Oration-chatbot.git
+    cd oration-chatbot
+    ```
+
+2. **Create environment file:**
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Fill in your environment variables in the `.env` file.
+
+3. **Build the Docker image:**
+
+    ```bash
+    docker build -t oration-chatbot .
+    ```
+
+4. **Run the container:**
+
+    ```bash
+    docker run -p 3000:3000 --env-file .env oration-chatbot
+    ```
+
+5. **Access the application:**
+   Open your browser and go to `http://localhost:3000`
+
+### Using Docker Compose
+
+For easier management with environment variables:
+
+1. **Update the `docker-compose.yml` file:**
+   Uncomment and fill in your environment variables in the `environment` section.
+
+2. **Run with Docker Compose:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+3. **View logs:**
+
+    ```bash
+    docker-compose logs -f
+    ```
+
+4. **Stop the application:**
+    ```bash
+    docker-compose down
+    ```
+
+### Environment Variables
+
+Make sure to set these environment variables in your `.env` file:
+
+```bash
+# Application
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Database
+DATABASE_URL="your-neon-db-connection-string"
+
+# Authentication
+BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="your-secret-key"
+
+# OAuth Providers
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+NEXT_PUBLIC_GOOGLE_ONE_TAP_CLIENT_ID="your-google-one-tap-client-id"
+
+# AI Service
+GEMINI_API_KEY="your-gemini-api-key"
+
+# Email Service
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_SENDER_NAME="Oration"
+EMAIL_SENDER_ADDRESS="noreply@oration.com"
+```
+
+---
+
+## �📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
